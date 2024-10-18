@@ -1,0 +1,8 @@
+{% extends "partials/base.html" %}
+{% block content %}
+
+<h3>Welcome {{user.username}}</h3>
+<h4>Role: {{user.get_role}}</h4>
+{% include "includes/alerts.html" %}
+
+{% endblock content %}
