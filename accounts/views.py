@@ -9,6 +9,7 @@ from .utils import detectUser, send_email_verification
 from django.core.exceptions import PermissionDenied
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
+from vendor.models import Vendor
 
 #Restrict vendor from accessing the Customer Dashboard
 def detect_vendor_user(user):
@@ -162,7 +163,11 @@ def custDashboard(request):
 @login_required(login_url="accounts:user-login")
 @user_passes_test(detect_vendor_user)
 def venDashboard(request):
-    return render(request, "accounts/vendor-dashboard.html")
+    vendor = Vendor.objects.get(user=request.user)
+    context = {
+        "vendor" : vendor,
+    }
+    return render(request, "accounts/vendor-dashboard.html", context)
 
 def forgot_password(request):
     if request.method == "POST":
