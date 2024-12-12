@@ -67,6 +67,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'accounts.context_processors.default',
+                'accounts.context_processors.get_api_key',
             ],
         },
     },
@@ -145,3 +146,5 @@ EMAIL_HOST_PASSWORD = 'jnhr kzrb kclo ggyl'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = 'foodOnline Marketplace <hamza.tahir.cs@gmail.com>'
+
+GOOGLE_API_KEY = 'AIzaSyB2O76vfw9zlTjBfoHPBFUpxWf5PRz2wxQ'
