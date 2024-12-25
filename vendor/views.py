@@ -7,7 +7,7 @@ from accounts.forms import UserProfileForm
 from django.contrib.auth.decorators import login_required, user_passes_test
 from accounts.views import detect_vendor_user
 from menu.models import Category, FoodItem
-from menu.forms import CategoryForm
+from menu.forms import CategoryForm, FoodItemForm
 from django.template.defaultfilters import slugify
 
 def get_vendor(request):
@@ -113,3 +113,52 @@ def delete_category(request, slug):
     category.delete()
     messages.success(request, "Category Deleted Successfully!")
     return redirect('accounts:vendor:menu-builder')
+
+'''FOOD ITEM CRUD'''
+def add_food(request):
+    if request.method == "POST":
+        form = FoodItemForm(request.POST, request.FILES)
+        if form.is_valid():
+            food_title = form.cleaned_data['food_title']
+            food_item = form.save(commit=False)
+            food_item.vendor = get_vendor(request)
+            food_item.slug = slugify(food_title)
+            food_item.save()
+            messages.success(request, "FoOd Added Successfully!")
+            return redirect('accounts:vendor:food-by-category', food_item.category.slug)
+    else:
+        form = FoodItemForm()
+        #modify this form to add only the food items of the specific vendor
+        form.fields['category'].queryset = Category.objects.filter(vendor=get_vendor(request))
+    context = {
+        "form" : form,
+    }
+    return render(request, 'vendors/add-food.html', context)
+
+def update_food(request, slug):
+    food = get_object_or_404(FoodItem, slug=slug)
+    if request.method == "POST":
+        form = FoodItemForm(request.POST, request.FILES, instance=food)
+        if form.is_valid():
+            food_title = form.cleaned_data['food_title']
+            food_item = form.save(commit=False)
+            food_item.vendor = get_vendor(request)
+            food_item.slug = slugify(food_title)
+            food_item.save()
+            messages.success(request, "FoOd Updated Successfully!")
+            return redirect('accounts:vendor:food-by-category', food_item.category.slug)
+    else:
+        form = FoodItemForm(instance=food)
+        #modify this form to add only the food items of the specific vendor
+        form.fields['category'].queryset = Category.objects.filter(vendor=get_vendor(request))
+    context ={
+        "form":form,
+        "food":food,
+    }
+    return render(request, 'vendors/update-food.html', context)
+
+def delete_food(request, slug):
+    food_item = get_object_or_404(FoodItem, slug=slug)
+    food_item.delete()
+    messages.success(request, "FoOd Item Deleted Successfully!")
+    return redirect('accounts:vendor:food-by-category', food_item.category.slug)
